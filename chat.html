@@ -1,0 +1,129 @@
+<html>
+    <head>
+        <title>Putazos</title>
+    </head>
+    <body>
+        <button id="registro_fb">Inicia sesión con Facebook</button>
+        <button id="registro_twitter">Inicia sesión con Tuita</button>
+        <button id="registro_google">Inicia sesión con Google</button>
+        <button id="logout">Cerrar sesión</button>
+        <hr>
+        <img id="imagen_user" src="" alt="">
+        <h1 id="nombre_user"></h1>
+        <h3 id="correo_user"></h3>
+        <br>
+        <div id="mensaje_div">
+            <h5>Escribe un mensaje provocador para retar a otros vatos</h5>
+            <textarea id="mensaje_provocador" cols="30" rows="10"></textarea>
+            <button id="enviar_provocador">Enviar mensaje provocador</button>
+        </div>
+        <div id="listar_mensajes">
+            <ul id="lista">
+
+            </ul>
+        </div>
+        <!-- Including jquery-->
+        <script
+             src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous">
+        </script>
+         <!-- Firebase -->
+        <script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
+        <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBs3DT2TwJ4viDjFUIneOh2Wlpk2HIOenY",
+            authDomain: "tinderfighter-a6986.firebaseapp.com",
+            databaseURL: "https://tinderfighter-a6986.firebaseio.com",
+            storageBucket: "tinderfighter-a6986.appspot.com",
+            messagingSenderId: "175380932378"
+        };
+        firebase.initializeApp(config);
+        </script>
+
+
+        <script>
+            var nombre = '';
+            var correo = '';
+            var img = '';
+            var uid = '';
+            var users = firebase.database().ref('users');
+            var mensajes = firebase.database().ref('mensajes');
+            $('#registro_fb').click(function(){
+                var provider = new firebase.auth.FacebookAuthProvider();
+                firebase.auth().signInWithPopup(provider).then(function(result){
+                    var token = result.credential.accessToken;
+                    var user = result.user;
+                    console.log(user);
+                });
+            });
+
+            $('#registro_twitter').click(function(){
+                var provider = new firebase.auth.TwitterAuthProvider();
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                     var token = result.credential.accessToken;
+                     var user = result.user;
+                     console.log(user);
+                });
+            });
+
+            $('#registro_google').click(function(){
+                var provider = new firebase.auth.GoogleAuthProvider();
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                     var token = result.credential.accessToken;
+                     var user = result.user;
+                     console.log(user);
+                });            
+            });
+
+        firebase.auth().onAuthStateChanged(function(user){
+                if(user){
+                    nombre = user.displayName;
+                    correo = user.email;
+                    img = user.photoURL;
+                    uid = user.uid;
+                    users.push({
+                        nombre:nombre,
+                        email:correo,
+                        uid:uid
+                    });
+                    $('#imagen_user').attr('src',img);
+                    $('#nombre_user').text(nombre);
+                    $('#correo_user').text(correo);
+                    $('#mensaje_div').css({'display':'block'});
+                    $('#listar_mensajes').css({'display':'block'});
+                    $('#logout').css({'display':'block'});
+                    mensajes.on('child_added',function(data){
+                        $('#lista').prepend('<li><h3>'+data.val().nombre+'<span>    '+data.val().fecha+'</span></h3><p>'+data.val().mensaje+'</p></li>')
+                    });
+                }
+                else{
+                    $('#mensaje_div').css({'display':'none'});
+                    $('#listar_mensajes').css({'display':'none'});
+                    $('#logout').css({'display':'none'});
+                }
+            });
+
+            $('#enviar_provocador').click(function(){
+                var d = new Date();
+                mensajes.push({
+                    nombre:nombre,
+                    uid:uid,
+                    mensaje:$('#mensaje_provocador').val(),
+                    fecha: d+''
+                });
+                $('#mensaje_provocador').val('');
+            });
+
+            $('#logout').click(function(){
+                 firebase.auth().signOut().then(function(){
+                     $('#imagen_user').attr('src','');
+                    $('#nombre_user').text('');
+                    $('#correo_user').text('');
+                });
+            });
+        </script>
+
+    </body>
+</html>

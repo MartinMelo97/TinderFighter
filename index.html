@@ -8,6 +8,12 @@
         <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
         <link rel="stylesheet" href="css/animate.css">
         <style>
+            body{
+                background-color: #455a64;
+            }
+            img{
+                max-width: 100%;
+            }
             .titulo{
                 font-family: 'Oswald', sans-serif;
             }
@@ -38,6 +44,13 @@
             }
             .iniciar:hover{
             	background-color: #212121;
+            }
+            #mensaje_provocador{
+                max-width: 100%;
+            }
+
+            #chat{
+                padding: 10px;
             }
         </style>
     </head>
@@ -81,8 +94,27 @@
 			<button id="facebook" class="btn indigo accent-4 col m2 offset-m1">Facebook</button>
 			<button id="google" class="btn red darken-2 col m2 offset-m2">Google</button>
 			<button id="twitter" class="btn blue lighten-1 col m2 offset-m2">Twitter</button>
-
+            
 		</div>
+
+        <div id="chat" class="row container white z-depth-2">
+            <img id="imagen_user" src="" alt="">
+            <h1 id="nombre_user"></h1>
+            <h3 id="correo_user"></h3>
+            <button id="logout" class="btn">Cerrar sesión</button>
+            <br>
+            <div id="mensaje_div">
+            
+                <h5>Escribe un mensaje provocador para retar a otros vatos</h5>
+                <textarea id="mensaje_provocador" class="materialize-textarea" cols="30" rows="10"></textarea>
+                <button id="enviar_provocador" class="btn">Enviar mensaje provocador</button>
+            </div>
+            <div id="listar_mensajes">
+                <ul id="lista">
+
+                </ul>
+            </div>
+        </div>
 
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
@@ -117,6 +149,117 @@
             messagingSenderId: "175380932378"
         };
         firebase.initializeApp(config);
+        </script>
+
+        <script>
+            var nombre = '';
+            var correo = '';
+            var img = '';
+            var uid = '';
+            var users = firebase.database().ref('users');
+            var mensajes = firebase.database().ref('mensajes');
+            $('#facebook').click(function(){
+                var provider = new firebase.auth.FacebookAuthProvider();
+                firebase.auth().signInWithPopup(provider).then(function(result){
+                    var token = result.credential.accessToken;
+                    var user = result.user;
+                    console.log(user);
+                    quitaInicio();
+                    muestraChat();
+                });
+            });
+
+            $('#twitter').click(function(){
+                var provider = new firebase.auth.TwitterAuthProvider();
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                     var token = result.credential.accessToken;
+                     var user = result.user;
+                     console.log(user);
+                    quitaInicio();
+                    muestraChat();
+                });
+            });
+
+            $('#google').click(function(){
+                var provider = new firebase.auth.GoogleAuthProvider();
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                     var token = result.credential.accessToken;
+                     var user = result.user;
+                     console.log(user);
+                    quitaInicio();
+                });            
+            });
+
+        firebase.auth().onAuthStateChanged(function(user){
+                if(user){
+                    nombre = user.displayName;
+                    correo = user.email;
+                    img = user.photoURL;
+                    uid = user.uid;
+                    users.push({
+                        nombre:nombre,
+                        email:correo,
+                        uid:uid
+                    });
+                    $('#imagen_user').attr('src',img);
+                    $('#nombre_user').text(nombre);
+                    $('#correo_user').text(correo);
+                    $('#mensaje_div').css({'display':'block'});
+                    $('#listar_mensajes').css({'display':'block'});
+                    $('#logout').css({'display':'block'});
+                    mensajes.on('child_added',function(data){
+                        $('#lista').prepend('<li><div class="chip grey lighten-5"><img src="'+data.val().link+'">'+data.val().nombre+'<span>    '+data.val().fecha+'</span></div><p>'+data.val().mensaje+'</p></li>')
+
+                    console.log(data.val());
+                    });
+                    quitaInicio();
+                    muestraChat();
+                }
+                else{
+                    $('#mensaje_div').css({'display':'none'});
+                    $('#listar_mensajes').css({'display':'none'});
+                    $('#logout').css({'display':'none'});
+                
+                }
+            });
+
+            $('#enviar_provocador').click(function(){
+                var d = new Date();
+                var user = firebase.auth().currentUser;
+                mensajes.push({
+                    nombre:nombre,
+                    uid:uid,
+                    link:user.photoURL,
+                    mensaje:$('#mensaje_provocador').val(),
+                    fecha: d+''
+                });
+                $('#mensaje_provocador').val('');
+            });
+
+            $('#logout').click(function(){
+                 firebase.auth().signOut().then(function(){
+                     $('#imagen_user').attr('src','');
+                    $('#nombre_user').text('');
+                    $('#correo_user').text('');
+                });
+            });
+        </script>
+        <script>
+            function quitaInicio(){
+                $('#inicio').fadeOut();
+            }
+
+            function muestraInicio(){
+                $('#inicio').fadeIn();
+            }
+
+            function muestraChat(){
+                $('#chat').fadeIn();
+            }
+
+            function quitaChat(){
+                $('#chat').fadeOut();
+            }
         </script>
     </body>
 </html>
