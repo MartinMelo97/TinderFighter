@@ -5,8 +5,43 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
         <link rel="stylesheet" href="styles.css">
+        <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+        <link rel="stylesheet" href="css/animate.css">
+        <style>
+            .titulo{
+                font-family: 'Oswald', sans-serif;
+            }
+            .slogan{
+                position: absolute;
+                bottom:5%;
+                left:6.5%;
+                text-shadow: 8px 8px 10px rgb(0,0,0);
+                width: 100%;
+            }
+            h1.main{
+                width: 100px;
+                margin: 0 !important;
+            }
+
+            #inicio{
+            	margin-top: 7.5%;
+            }
+
+            .iniciar{
+            	background-color: transparent;
+            	border: 0;
+            	font-size:3em !important;
+            	text-shadow: 8px 8px 10px rgb(0,0,0);
+            	border-radius: 3px;
+            	transition: .3s;
+            	margin-top: 10px;
+            }
+            .iniciar:hover{
+            	background-color: #212121;
+            }
+        </style>
     </head>
-    <body>
+    <body class="rey lighten-5">
          <nav id="nav">
             <div class="nav-wrapper grey darken-4">
             <a href="#!" class="brand-logo">TinderFighter</a>
@@ -25,26 +60,49 @@
             </ul>
             </div>
         </nav>
+        
         <div class="parallax-container">
+                
+            <div class="slogan">
+                <h1 class="titulo white-text main one animated bounceInLeft"> Tinder </h1>
+                <h1 class="titulo white-text main two animated bounceInRight"> Fighter </h1>
+
+                <button class="titulo white-text animated bounceInUp iniciar">¡Busca tu pelea!</button>
+            </div>
             <div class="parallax">
                 <img src="img/back3.jpg" alt="">
             </div>
         </div>
+		
+		<div id="inicio" class="row">
+			
+			<h1 class="center" style="margin-bottom:8%;">Inicia sesión con:</h1>
+
+			<button id="facebook" class="btn indigo accent-4 col m2 offset-m1">Facebook</button>
+			<button id="google" class="btn red darken-2 col m2 offset-m2">Google</button>
+			<button id="twitter" class="btn blue lighten-1 col m2 offset-m2">Twitter</button>
+
+		</div>
+
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <!--
-        <script>
-            //    
-            $(document).ready(function(){
-                $('#nav').css({'background-color':'rgba(0,0,0,.1)'});
-                $('.nav-wrapper').css({'color':'#232323'});
-            });
-        </script>
-        -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
         <!-- Materialize-Css-->
         <script>
                 $(document).ready(function(){
                     $('.parallax').parallax();
+                    $("#animarscroll").on("click", function(){
+                        var posicion = $("#hastaaqui").offset().top;
+                        $("html, body").animate({
+                            scrollTop: posicion
+                        }, 2000); 
+                    });
+
+                    $(".iniciar").on("click", function(){
+			            var posicion = $("#inicio").offset().top;
+			            $("html, body").animate({
+			                scrollTop: posicion
+			            }, 2000); 
+			        });
                 });
         </script>
         <!-- Firebase -->
